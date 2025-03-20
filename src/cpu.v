@@ -25,7 +25,7 @@ reg [3:0]reg_id;
 reg [63:0]reg_wd;
 reg reg_we = 0;
 reg reg_re = 0;
-regfile #(.DEBUG(1)) rf(.clk(clk), .id(reg_id), .write(reg_we), .read(reg_re), .value(reg_wd));
+regfile #(.DEBUG(0)) rf(.clk(clk), .id(reg_id), .write(reg_we), .read(reg_re), .value(reg_wd));
 
 localparam STATE_BEGIN = 0;
 localparam STATE_READ = 1;
