@@ -1,6 +1,6 @@
 .PHONY: run
 
-.build/%: src/*.v src/isa/*.v src/tests/%.v
+.build/%: src/*.v src/isa/*.v src/tb/%.v
 	iverilog $^ -o $@
 
 .build:

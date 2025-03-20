@@ -7,7 +7,8 @@ module cpu(
     output reg ram_txs,
     output reg ram_we, output reg [31:0]ram_wd,
     output reg ram_re,
-    output reg [63:0]ram_addr
+    output reg [63:0]ram_addr,
+    output hlt
 );
 
 reg [1:0]alu_op;
@@ -31,8 +32,10 @@ localparam STATE_BEGIN = 0;
 localparam STATE_READ = 1;
 localparam STATE_EXECUTE = 2;
 localparam STATE_END = 3;
+localparam STATE_HLT = 4;
 
-reg [1:0]state = STATE_BEGIN;
+reg [2:0]state = STATE_BEGIN;
+assign hlt = state == STATE_HLT;
 
 reg [31:0]instr;
 wire [11:0]opcode; assign opcode = instr[11:0];
@@ -44,7 +47,6 @@ wire [3:0]r4; assign r4 = instr[31:28];
 wire [15:0]imm; assign imm = instr[31:16];
 
 task dump(); begin
-    $display("Dumping core...");
     $display("--- INTERNAL ---");
     $display(" ip: %h", ip.val);
     $display("--- REGISTERS ---");
@@ -145,9 +147,7 @@ always @(posedge clk) begin
                     reg_we = sethh.reg_we;
                 end
                 OP_HLT: begin
-                    $display("HLT instruction! Exiting...");
-                    dump();
-                    $finish;
+                    state <= STATE_HLT;
                 end
                 OP_MOV: begin
                     finish_on(mov.finished);
@@ -275,6 +275,12 @@ always @(posedge clk) begin
             if (!ip_set) inc_ip <= 1;
             ip_set <= 0;
             state <= STATE_BEGIN;
+        end
+        STATE_HLT: begin end
+        default: begin
+            $display("invalid cpu state %0d", state);
+            dump();
+            $stop;
         end
     endcase
 end

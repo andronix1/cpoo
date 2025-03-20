@@ -30,6 +30,11 @@ cpu cpu(
     .ram_addr(ram_addr)
 );
 
+always @(posedge cpu.hlt) begin
+    cpu.dump();
+    $finish;
+end
+
 initial $dumpvars;
 
 endmodule
