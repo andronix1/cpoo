@@ -4,7 +4,8 @@ module ram #(
     parameter SIZE = 0,
     parameter DUMP_PATH = "",
     parameter DEBUG_TX = 0,
-    parameter DEBUG_CMD = 0,
+    parameter DEBUG_READ = 0,
+    parameter DEBUG_WRITE = 0,
     parameter DEBUG_ERR = 0
 ) (
     input clk,
@@ -30,11 +31,11 @@ task run_command(); begin
     if (!err) begin
         if (read) begin
             out <= memory[addr];
-            if (DEBUG_CMD) $display("RAM: [%0d] => %0d", addr, memory[addr]);
+            if (DEBUG_READ) $display("RAM: [%0d] => %0d", addr, memory[addr]);
         end
         if (write) begin
             memory[addr] <= value;
-            if (DEBUG_CMD) $display("RAM: [%0d] <= %0d", addr, value);
+            if (DEBUG_WRITE) $display("RAM: [%0d] <= %0d", addr, value);
         end
         if (!read && !write) begin
             err <= 1;
@@ -45,7 +46,7 @@ task run_command(); begin
     end
 end endtask
 
-always @(clk) begin
+always @(posedge clk) begin
     case (state)
         STATE_WAITING_INPUT: if (txs) begin
             if (DEBUG_TX) $display("RAM: tx start");

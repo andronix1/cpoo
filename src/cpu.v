@@ -79,6 +79,8 @@ localparam OP_ADD = 14;
 localparam OP_SUB = 15;
 localparam OP_MUL = 16;
 localparam OP_DIV = 17;
+localparam OP_PUSHL = 18;
+localparam OP_PUSHH = 19;
 isa_clr clr(.clk(clk), .enabled(ex && opcode == OP_CLR), .r0(r0));
 isa_set #(.POS(0)) setll(.clk(clk), .enabled(ex && opcode == OP_SETLL), .r0(r0), .imm(imm), .reg_out(rf.out));
 isa_set #(.POS(1)) setlh(.clk(clk), .enabled(ex && opcode == OP_SETLH), .r0(r0), .imm(imm), .reg_out(rf.out));
@@ -96,6 +98,8 @@ isa_alu_exec #(.ALU_OP(0 /* alu.ADD */)) add(.clk(clk), .enabled(ex && opcode ==
 isa_alu_exec #(.ALU_OP(1 /* alu.SUB */)) sub(.clk(clk), .enabled(ex && opcode == OP_SUB), .r0(r0), .r1(r1), .r2(r2), .alu_out(alu.c), .reg_out(rf.out));
 isa_alu_exec #(.ALU_OP(2 /* alu.MUL */)) mul(.clk(clk), .enabled(ex && opcode == OP_MUL), .r0(r0), .r1(r1), .r2(r2), .alu_out(alu.c), .reg_out(rf.out));
 isa_alu_exec #(.ALU_OP(3 /* alu.DIV */)) div(.clk(clk), .enabled(ex && opcode == OP_DIV), .r0(r0), .r1(r1), .r2(r2), .alu_out(alu.c), .reg_out(rf.out));
+isa_push #(.PART_ID(0)) pushl(.clk(clk), .enabled(ex && opcode == OP_PUSHL), .r0(r0), .ram_txe(ram_txe), .reg_out(rf.out));
+isa_push #(.PART_ID(1)) pushh(.clk(clk), .enabled(ex && opcode == OP_PUSHH), .r0(r0), .ram_txe(ram_txe), .reg_out(rf.out));
 
 always @(posedge clk) begin
     case (state)
@@ -119,9 +123,9 @@ always @(posedge clk) begin
             case (opcode)
                 OP_CLR: begin
                     finish_on(clr.finished);
-                    reg_id <= clr.reg_id;
-                    reg_wd <= clr.reg_wd;
-                    reg_we <= clr.reg_we;
+                    reg_id = clr.reg_id;
+                    reg_wd = clr.reg_wd;
+                    reg_we = clr.reg_we;
                 end
                 OP_SETLL: begin
                     finish_on(setll.finished);
@@ -267,6 +271,28 @@ always @(posedge clk) begin
                     alu_a = div.alu_a;
                     alu_b = div.alu_b;
                     alu_op = div.alu_op;
+                end
+                OP_PUSHL: begin
+                    finish_on(pushl.finished);
+                    ram_txs = pushl.ram_txs;
+                    ram_we = pushl.ram_we;
+                    ram_wd = pushl.ram_wd;
+                    ram_addr = pushl.ram_addr;
+                    reg_id = pushl.reg_id;
+                    reg_wd = pushl.reg_wd;
+                    reg_re = pushl.reg_re;
+                    reg_we = pushl.reg_we;
+                end
+                OP_PUSHH: begin
+                    finish_on(pushh.finished);
+                    ram_txs = pushh.ram_txs;
+                    ram_we = pushh.ram_we;
+                    ram_wd = pushh.ram_wd;
+                    ram_addr = pushh.ram_addr;
+                    reg_id = pushh.reg_id;
+                    reg_wd = pushh.reg_wd;
+                    reg_re = pushh.reg_re;
+                    reg_we = pushh.reg_we;
                 end
                 default: begin
                     $display("invalid opcode %0d", opcode);

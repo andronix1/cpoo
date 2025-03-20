@@ -14,7 +14,7 @@ wire [31:0]ram_wd;
 wire ram_re;
 wire [63:0]ram_addr;
 
-ram #(.SIZE(32), .DUMP_PATH("imgs/ram.bin")) ram(
+ram #(.DEBUG_ERR(1), .DEBUG_WRITE(1), .SIZE(32), .DUMP_PATH("imgs/ram.bin")) ram(
     .clk(ram_clk),
     .txe(ram_txe), .txs(ram_txs),
     .read(ram_re), .out(ram_out),

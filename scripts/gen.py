@@ -37,10 +37,16 @@ def add(r0, r1, r2): reg(14, r0, r1, r2)
 def sub(r0, r1, r2): reg(15, r0, r1, r2)
 def mul(r0, r1, r2): reg(16, r0, r1, r2)
 def div(r0, r1, r2): reg(17, r0, r1, r2)
+def pushl(r0): reg(18, r0)
+def pushh(r0): reg(19, r0)
 def _ip(): return len(output)
 def r(n): return n
+sp = 15
 
 # ---------------------
+clr(sp)
+setll(sp, 20);
+
 clr(r(0))
 
 clr(r(1))
@@ -54,6 +60,9 @@ loop = _ip()
 setll(r(3), loop)
 add(r(0), r(0), r(2))
 brl(r(0), r(1), r(3))
+
+pushl(r(0))
+pushh(r(0))
 hlt()
 # ---------------------
 
