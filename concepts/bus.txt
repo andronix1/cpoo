@@ -1,0 +1,47 @@
+Bus:
+   |
+   |- [7:0]devId -|
+   |              |--- [63:0]data
+   |              |--------- txs
+   |              |--------- txe
+   |              |--------- interrupt
+   |
+  ...
+
+Interrupt Controller:
+             ____________
+    I1 >----|            |---< finished
+    I2 >----| Interrupt  |---> dev_id
+    I2 >----| Controller |---> available
+        ... |            |
+  I255 >----|____________|
+
+
+In:
+    CPU: txs <= 0
+    DEV: txe <= 0
+    CPU: devId <= <device id>
+         txs <= 1
+    DEV:
+         data <= <data to send>
+         txe <= 1
+
+Out:
+    CPU: txs <= 0
+    DEV: txe <= 0
+    CPU: devId <= <device id>
+         data <= <data to send>
+         txs <= 1
+    DEV: txe <= 1
+
+Interrupt:
+    CPU: next == 0
+    DEV: int <= 1
+     IC: wait <= 1
+    CPU: next <= 1
+     IC: dev_id <= <device id>
+    CPU: next <= 0
+     IC: wait <= 0
+    ...
+     IC: wait <= 1 // if there is any devices exists
+
