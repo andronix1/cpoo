@@ -5,10 +5,11 @@ module isa_pop #(
     input enabled,
     input [3:0]r0,
     input ram_txe,
+    input [31:0]ram_out,
     input [63:0]reg_out,
     
     output reg ram_txs,
-    output reg ram_re, output [31:0]ram_out,
+    output reg ram_re,
     output [63:0]ram_addr,
     output reg [3:0]reg_id,
     output reg [63:0]reg_wd,

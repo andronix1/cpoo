@@ -83,6 +83,8 @@ localparam OP_PUSHL = 18;
 localparam OP_PUSHH = 19;
 localparam OP_POPL = 20;
 localparam OP_POPH = 21;
+localparam OP_CALL = 22;
+localparam OP_RET = 23;
 isa_clr clr(.clk(clk), .enabled(ex && opcode == OP_CLR), .r0(r0));
 isa_set #(.POS(0)) setll(.clk(clk), .enabled(ex && opcode == OP_SETLL), .r0(r0), .imm(imm), .reg_out(rf.out));
 isa_set #(.POS(1)) setlh(.clk(clk), .enabled(ex && opcode == OP_SETLH), .r0(r0), .imm(imm), .reg_out(rf.out));
@@ -104,6 +106,8 @@ isa_push #(.PART_ID(0)) pushl(.clk(clk), .enabled(ex && opcode == OP_PUSHL), .r0
 isa_push #(.PART_ID(1)) pushh(.clk(clk), .enabled(ex && opcode == OP_PUSHH), .r0(r0), .ram_txe(ram_txe), .reg_out(rf.out));
 isa_pop #(.PART_ID(0)) popl(.clk(clk), .enabled(ex && opcode == OP_POPL), .r0(r0), .ram_txe(ram_txe), .reg_out(rf.out), .ram_out(ram_out));
 isa_pop #(.PART_ID(1)) poph(.clk(clk), .enabled(ex && opcode == OP_POPH), .r0(r0), .ram_txe(ram_txe), .reg_out(rf.out), .ram_out(ram_out));
+isa_call call(.clk(clk), .enabled(ex && opcode == OP_CALL), .r0(r0), .ram_txe(ram_txe), .reg_out(rf.out), .ip_val(ip.val));
+isa_ret ret(.clk(clk), .enabled(ex && opcode == OP_RET), .ram_txe(ram_txe), .ram_out(ram_out), .reg_out(rf.out), .ip_val(ip.val));
 
 always @(posedge clk) begin
     case (state)
@@ -317,6 +321,31 @@ always @(posedge clk) begin
                     reg_wd = poph.reg_wd;
                     reg_re = poph.reg_re;
                     reg_we = poph.reg_we;
+                end
+                OP_CALL: begin
+                    finish_on(call.finished);
+                    ip_set = call.ip_set;
+                    ip_val = call.ip_wd;
+                    ram_txs = call.ram_txs;
+                    ram_we = call.ram_we;
+                    ram_wd = call.ram_wd;
+                    ram_addr = call.ram_addr;
+                    reg_id = call.reg_id;
+                    reg_wd = call.reg_wd;
+                    reg_re = call.reg_re;
+                    reg_we = call.reg_we;
+                end
+                OP_RET: begin
+                    finish_on(ret.finished);
+                    ip_set = ret.ip_set;
+                    ip_val = ret.ip_wd;
+                    ram_txs = ret.ram_txs;
+                    ram_re = ret.ram_re;
+                    ram_addr = ret.ram_addr;
+                    reg_id = ret.reg_id;
+                    reg_wd = ret.reg_wd;
+                    reg_re = ret.reg_re;
+                    reg_we = ret.reg_we;
                 end
                 default: begin
                     $display("invalid opcode %0d", opcode);

@@ -41,13 +41,30 @@ def pushl(r0): reg(18, r0)
 def pushh(r0): reg(19, r0)
 def popl(r0): reg(20, r0)
 def poph(r0): reg(21, r0)
+def call(r0): reg(22, r0)
+def ret(): reg(23)
 def _ip(): return len(output)
 def r(n): return n
+csp = 14
 sp = 15
 
 # ---------------------
+START = 5
+
+clr(r(0))
+setll(r(0), START)
+br(r(0))
+
+f = _ip()
+setll(r(7), 1234)
+ret()
+
+assert(START == _ip())
+
 clr(sp)
-setll(sp, 20);
+setll(sp, 48);
+clr(csp)
+setll(csp, 63);
 
 clr(r(0))
 
@@ -67,6 +84,10 @@ pushl(r(0))
 pushh(r(0))
 poph(r(4))
 popl(r(4))
+
+clr(r(5))
+setll(r(5), f)
+call(r(5))
 hlt()
 # ---------------------
 
@@ -80,7 +101,7 @@ for instr in output:
     binary += b((instr >> 8) & 0xff)
     binary += b(instr & 0xff)
     binary += '\n'
-for i in range(32 - len(output)):
+for i in range(64 - len(output)):
     binary += '1' * 32 
     binary += '\n'
 

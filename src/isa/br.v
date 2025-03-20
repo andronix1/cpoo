@@ -37,7 +37,6 @@ always @(posedge (clk && enabled)) begin
             state <= STATE_CLEAR;
         end
         STATE_CLEAR: begin 
-            ip_set <= 0;
             finished <= 1;
         end
     endcase
