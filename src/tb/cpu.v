@@ -27,7 +27,8 @@ cpu cpu(
     .ram_txe(ram_txe), .ram_txs(ram_txs),
     .ram_re(ram_re), .ram_out(ram_out),
     .ram_we(ram_we), .ram_wd(ram_wd),
-    .ram_addr(ram_addr)
+    .ram_addr(ram_addr),
+    .int(1'b0), .int_dev_id(8'b0)
 );
 
 always @(posedge cpu.hlt) begin

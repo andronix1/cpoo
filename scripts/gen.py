@@ -49,9 +49,11 @@ setll(r(1), 123)
 clr(r(2))
 setll(r(2), 1)
 
+clr(r(3))
 loop = _ip()
+setll(r(3), loop)
 add(r(0), r(0), r(2))
-brl(r(0), r(1), loop)
+brl(r(0), r(1), r(3))
 hlt()
 # ---------------------
 

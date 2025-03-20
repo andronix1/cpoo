@@ -3,6 +3,8 @@ module cpu(
     input ram_txe,
     input ram_err,
     input [31:0]ram_out,
+    input [7:0]int_dev_id,
+    input int,
 
     output reg ram_txs,
     output reg ram_we, output reg [31:0]ram_wd,
@@ -33,6 +35,7 @@ localparam STATE_READ = 1;
 localparam STATE_EXECUTE = 2;
 localparam STATE_END = 3;
 localparam STATE_HLT = 4;
+localparam STATE_INTERRUPTED = 5;
 
 reg [2:0]state = STATE_BEGIN;
 assign hlt = state == STATE_HLT;
@@ -98,7 +101,9 @@ always @(posedge clk) begin
     case (state)
         STATE_BEGIN: begin
             inc_ip <= 0;
-            if (!ram_txe) begin
+            if (int) begin
+                state <= STATE_INTERRUPTED;
+            end else if (!ram_txe) begin
                 ram_txs <= 1;
                 ram_re <= 1;
                 ram_addr <= ip.val;
@@ -277,6 +282,10 @@ always @(posedge clk) begin
             state <= STATE_BEGIN;
         end
         STATE_HLT: begin end
+        STATE_INTERRUPTED: begin
+            $display("TODO: interrupt logic");
+            state <= STATE_HLT;
+        end
         default: begin
             $display("invalid cpu state %0d", state);
             dump();

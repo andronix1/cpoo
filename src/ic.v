@@ -20,15 +20,18 @@ always @(negedge enable) begin
     state <= STATE_WAITING_FINISH;
 end
 
+integer reading = 1;
+
 always @(posedge (clk && enable)) begin
     case (state)
         STATE_WAITING_FINISH: begin
             if (ints != 0) begin
                 available <= 1;
-                // TODO: encoder
-                for (integer i = 0; i < DEV_IDS; i++)
-                    if (ints[i])
+                for (integer i = 0; i < DEV_IDS && reading; i++)
+                    if (ints[i]) begin
                         dev_id <= i;
+                        reading = 0;
+                    end
                 state <= STATE_SENDING_ID;
             end
         end

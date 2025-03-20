@@ -24,11 +24,6 @@ always @(posedge clk) begin
     end
 end
 
-initial begin
-    for (integer i = 0; i < REGS_COUNT; i += 1)
-        regs[i] = 0;
-end
-
 task dump();
     integer j;
 begin
