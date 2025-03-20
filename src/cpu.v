@@ -81,6 +81,8 @@ localparam OP_MUL = 16;
 localparam OP_DIV = 17;
 localparam OP_PUSHL = 18;
 localparam OP_PUSHH = 19;
+localparam OP_POPL = 20;
+localparam OP_POPH = 21;
 isa_clr clr(.clk(clk), .enabled(ex && opcode == OP_CLR), .r0(r0));
 isa_set #(.POS(0)) setll(.clk(clk), .enabled(ex && opcode == OP_SETLL), .r0(r0), .imm(imm), .reg_out(rf.out));
 isa_set #(.POS(1)) setlh(.clk(clk), .enabled(ex && opcode == OP_SETLH), .r0(r0), .imm(imm), .reg_out(rf.out));
@@ -100,6 +102,8 @@ isa_alu_exec #(.ALU_OP(2 /* alu.MUL */)) mul(.clk(clk), .enabled(ex && opcode ==
 isa_alu_exec #(.ALU_OP(3 /* alu.DIV */)) div(.clk(clk), .enabled(ex && opcode == OP_DIV), .r0(r0), .r1(r1), .r2(r2), .alu_out(alu.c), .reg_out(rf.out));
 isa_push #(.PART_ID(0)) pushl(.clk(clk), .enabled(ex && opcode == OP_PUSHL), .r0(r0), .ram_txe(ram_txe), .reg_out(rf.out));
 isa_push #(.PART_ID(1)) pushh(.clk(clk), .enabled(ex && opcode == OP_PUSHH), .r0(r0), .ram_txe(ram_txe), .reg_out(rf.out));
+isa_pop #(.PART_ID(0)) popl(.clk(clk), .enabled(ex && opcode == OP_POPL), .r0(r0), .ram_txe(ram_txe), .reg_out(rf.out), .ram_out(ram_out));
+isa_pop #(.PART_ID(1)) poph(.clk(clk), .enabled(ex && opcode == OP_POPH), .r0(r0), .ram_txe(ram_txe), .reg_out(rf.out), .ram_out(ram_out));
 
 always @(posedge clk) begin
     case (state)
@@ -293,6 +297,26 @@ always @(posedge clk) begin
                     reg_wd = pushh.reg_wd;
                     reg_re = pushh.reg_re;
                     reg_we = pushh.reg_we;
+                end
+                OP_POPL: begin
+                    finish_on(popl.finished);
+                    ram_txs = popl.ram_txs;
+                    ram_re = popl.ram_re;
+                    ram_addr = popl.ram_addr;
+                    reg_id = popl.reg_id;
+                    reg_wd = popl.reg_wd;
+                    reg_re = popl.reg_re;
+                    reg_we = popl.reg_we;
+                end
+                OP_POPH: begin
+                    finish_on(poph.finished);
+                    ram_txs = poph.ram_txs;
+                    ram_re = poph.ram_re;
+                    ram_addr = poph.ram_addr;
+                    reg_id = poph.reg_id;
+                    reg_wd = poph.reg_wd;
+                    reg_re = poph.reg_re;
+                    reg_we = poph.reg_we;
                 end
                 default: begin
                     $display("invalid opcode %0d", opcode);

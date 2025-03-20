@@ -39,6 +39,8 @@ def mul(r0, r1, r2): reg(16, r0, r1, r2)
 def div(r0, r1, r2): reg(17, r0, r1, r2)
 def pushl(r0): reg(18, r0)
 def pushh(r0): reg(19, r0)
+def popl(r0): reg(20, r0)
+def poph(r0): reg(21, r0)
 def _ip(): return len(output)
 def r(n): return n
 sp = 15
@@ -63,6 +65,8 @@ brl(r(0), r(1), r(3))
 
 pushl(r(0))
 pushh(r(0))
+poph(r(4))
+popl(r(4))
 hlt()
 # ---------------------
 
