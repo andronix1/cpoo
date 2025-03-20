@@ -1,0 +1,40 @@
+Registers: 4-bit
+    r0, r1, r2, r3, r4, r5, r6, r7, r8
+    a0, a2, a3, a4,
+    .., .., br, sp
+
+Instructions: 32-bit
+    REG | add r0 r1 r2 r3 r4 | 6 * 3  = 18 bit
+    IMM | set r0 123         | 16 + 4 = 20 bit
+
+    opcode - 12-bit
+
+### FIBONACCI ###
+set r0, 1         ; clr r0
+                  ; setll r0, 1
+push r0
+push r0
+mov r0 r1
+clr r3
+set r4 10          ; clr r4
+                   ; setll r4, 10
+@lbl1
+    mov r2 r0
+    mov r0 r1
+    add r1 r0 r2
+    push r1
+    incu r3
+    set br @lbl  ; depends on value
+    brl r3 r4
+#################
+
+push
+mov
+incu
+brl
+
+clr
+setll
+setlh
+sethl
+sethh
